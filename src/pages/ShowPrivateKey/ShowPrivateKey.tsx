@@ -1,10 +1,10 @@
 import { FormEvent, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
-import { WalletFactory } from "../../factory";
 import { useForm } from "../../hooks";
 import { ROUTE } from "../../routes/routes";
 import { userSelector, walletSelector } from "../../store";
+import { WalletKeeper } from "../../models";
 
 const ShowPrivateKey = () => {
   const { address = "" } = useParams();
@@ -19,12 +19,10 @@ const ShowPrivateKey = () => {
 
     if (wallet && user) {
       try {
-        const walletFactory = new WalletFactory(user);
-        const privateKey =
-          await walletFactory.createPrivateKeyFromEncryptedJson(
-            wallet.privateKey,
-            formData.password
-          );
+        const privateKey = await WalletKeeper.getPrivateKeyFromWallet(
+          wallet,
+          formData.password
+        );
 
         setPrivateKey(privateKey);
       } catch (error) {

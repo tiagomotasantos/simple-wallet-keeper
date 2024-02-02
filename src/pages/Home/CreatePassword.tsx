@@ -1,7 +1,7 @@
 import { FormEvent } from "react";
 import { useForm } from "../../hooks";
 import { useDispatch } from "react-redux";
-import { createUser } from "../../store/walletKeeperSlice";
+import { updateUser } from "../../store/walletKeeperSlice";
 import { useNavigate } from "react-router-dom";
 import { ROUTE } from "../../routes/routes";
 
@@ -29,7 +29,7 @@ const CreatePassword = () => {
     if (error) {
       setError(error);
     } else {
-      dispatch(createUser({ password: formData.newPassword }));
+      dispatch(updateUser({ password: formData.newPassword }));
       navigate(ROUTE.WALLETS);
     }
   };

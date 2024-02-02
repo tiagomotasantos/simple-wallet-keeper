@@ -16,7 +16,7 @@ export const walletKeeperSlice = createSlice({
   name: "walletKeeper",
   initialState,
   reducers: {
-    createUser: (state, action: PayloadAction<User>) => {
+    updateUser: (state, action: PayloadAction<User>) => {
       state.user = action.payload;
     },
     createWallet: (state, action: PayloadAction<Wallet>) => {
@@ -25,6 +25,6 @@ export const walletKeeperSlice = createSlice({
   },
 });
 
-export const { createUser, createWallet } = walletKeeperSlice.actions;
+export const { updateUser, createWallet } = walletKeeperSlice.actions;
 
 export default walletKeeperSlice.reducer;

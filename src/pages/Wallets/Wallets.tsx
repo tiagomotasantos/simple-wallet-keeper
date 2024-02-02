@@ -1,7 +1,7 @@
-import { ChangeEvent, useCallback, useMemo, useState } from "react";
+import { ChangeEvent, useCallback, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { WalletFactory } from "../../factory";
+import { WalletKeeper } from "../../models";
 import { ROUTE } from "../../routes/routes";
 import { walletsSelector } from "../../store";
 import Wallet from "./Wallet";
@@ -11,14 +11,13 @@ const NETWORKS = [
   { label: "Sepolia", value: "sepolia" },
 ];
 const Wallets = () => {
-  const walletFactory = useMemo(() => new WalletFactory(null), []);
-  const [provider, setProvider] = useState(walletFactory.getProvider("goerli"));
+  const [provider, setProvider] = useState(WalletKeeper.getProvider("goerli"));
   const wallets = useSelector(walletsSelector);
   const onChange = useCallback(
     (event: ChangeEvent<HTMLSelectElement>) => {
-      setProvider(walletFactory.getProvider(event.target.value));
+      setProvider(WalletKeeper.getProvider(event.target.value));
     },
-    [walletFactory, setProvider]
+    [setProvider]
   );
 
   return (

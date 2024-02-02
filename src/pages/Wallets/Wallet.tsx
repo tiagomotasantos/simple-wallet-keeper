@@ -1,7 +1,7 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Wallet as WalletModel } from "../../models";
-import WalletFactory, { NetworkProvider } from "../../factory/WalletFactory";
+import WalletKeeper, { NetworkProvider } from "../../models/WalletKeeper";
 
 interface WalletProps {
   wallet: WalletModel;
@@ -10,21 +10,20 @@ interface WalletProps {
 
 const Wallet: FC<WalletProps> = ({ wallet, provider }) => {
   const [balance, setBalance] = useState("");
-  const getBalance = async () => {
+  const getBalance = useCallback(async () => {
     try {
-      const walletFactory = new WalletFactory(null);
-      const b = await provider.getBalance(wallet.address);
+      const walletBalance = await provider.getBalance(wallet.address);
 
-      setBalance(walletFactory.formatBalance(b));
+      setBalance(WalletKeeper.formatBalance(walletBalance));
     } catch (error) {
       // failed to load balance
       console.log(error);
     }
-  };
+  }, [provider, wallet, setBalance]);
 
   useEffect(() => {
     getBalance();
-  }, [provider]);
+  }, [provider, getBalance]);
 
   return (
     <div>

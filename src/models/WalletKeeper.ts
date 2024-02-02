@@ -5,43 +5,41 @@ import ENC from "crypto-js/enc-utf8";
 
 export type NetworkProvider = ethers.AbstractProvider;
 
-class WalletFactory {
-  private user: User | null;
-
-  constructor(user: User | null) {
-    this.user = user;
-  }
-
-  async createWallet(name: string): Promise<Wallet> {
+class WalletKeeper {
+  static async createWallet(name: string, user: User): Promise<Wallet> {
     const wallet = ethers.Wallet.createRandom();
-    const privateKey = await wallet.encrypt(this.user!.password);
+    const encrypted = await wallet.encrypt(user.password);
+    const encryptedWallet = AES.encrypt(encrypted, user.password).toString();
 
     return {
       name,
       address: wallet.address,
-      privateKey: AES.encrypt(privateKey, this.user!.password).toString(),
+      encryptedWallet,
     };
   }
 
-  async createPrivateKeyFromEncryptedJson(
-    json: string,
+  static async getPrivateKeyFromWallet(
+    wallet: Wallet,
     password: string
   ): Promise<string> {
-    const wallet = await ethers.Wallet.fromEncryptedJson(
-      AES.decrypt(json, password).toString(ENC),
+    const decryptedWallet = await ethers.Wallet.fromEncryptedJson(
+      AES.decrypt(wallet.encryptedWallet, password).toString(ENC),
       password
     );
 
-    return wallet.privateKey;
+    return decryptedWallet.privateKey;
   }
 
-  async verifyUserPassword(
+  static async verifyUserPassword(
     password: string,
     wallets: Wallet[]
   ): Promise<boolean> {
     if (wallets.length) {
       try {
-        await ethers.Wallet.fromEncryptedJson(wallets[0].privateKey, password);
+        await ethers.Wallet.fromEncryptedJson(
+          AES.decrypt(wallets[0].encryptedWallet, password).toString(ENC),
+          password
+        );
 
         return true;
       } catch (error) {
@@ -52,20 +50,20 @@ class WalletFactory {
     return false;
   }
 
-  getProvider(network: string): NetworkProvider {
+  static getProvider(network: string): NetworkProvider {
     return ethers.getDefaultProvider(network);
   }
 
-  async getWalletBalance(
+  static getWalletBalance(
     provider: NetworkProvider,
     address: string
   ): Promise<bigint> {
     return provider.getBalance(address);
   }
 
-  formatBalance(balance: bigint): string {
+  static formatBalance(balance: bigint): string {
     return ethers.formatEther(balance);
   }
 }
 
-export default WalletFactory;
+export default WalletKeeper;

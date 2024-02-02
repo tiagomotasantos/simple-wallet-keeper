@@ -1,11 +1,11 @@
 import { FormEvent } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { WalletFactory } from "../../factory";
 import { useForm } from "../../hooks";
 import { ROUTE } from "../../routes/routes";
 import { userSelector, walletsSelector } from "../../store";
 import { createWallet } from "../../store/walletKeeperSlice";
+import { WalletKeeper } from "../../models";
 
 const CreateWallet = () => {
   const dispatch = useDispatch();
@@ -31,11 +31,14 @@ const CreateWallet = () => {
       if (error) {
         setError(error);
       } else {
-        const walletFactory = new WalletFactory(user!);
-        const wallet = await walletFactory.createWallet(formData.name);
+        if (user) {
+          const wallet = await WalletKeeper.createWallet(formData.name, user);
 
-        dispatch(createWallet(wallet));
-        navigate(ROUTE.WALLETS);
+          dispatch(createWallet(wallet));
+          navigate(ROUTE.WALLETS);
+        } else {
+          navigate(ROUTE.HOME);
+        }
       }
     } catch (error) {
       setError("Failed to create wallet");

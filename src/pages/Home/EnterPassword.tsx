@@ -2,13 +2,12 @@ import { FormEvent } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "../../hooks";
-import { WalletFactory } from "../../factory";
-import { userSelector, walletsSelector } from "../../store";
-import { createUser } from "../../store/walletKeeperSlice";
+import { WalletKeeper } from "../../models";
 import { ROUTE } from "../../routes/routes";
+import { walletsSelector } from "../../store";
+import { updateUser } from "../../store/walletKeeperSlice";
 
 const EnterPassword = () => {
-  const user = useSelector(userSelector);
   const wallets = useSelector(walletsSelector);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -17,14 +16,13 @@ const EnterPassword = () => {
   });
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    const walletFactory = new WalletFactory(user!);
-    const isValidPassword = await walletFactory.verifyUserPassword(
+    const isValidPassword = await WalletKeeper.verifyUserPassword(
       formData.password,
       wallets
     );
 
     if (isValidPassword) {
-      dispatch(createUser({ password: formData.password }));
+      dispatch(updateUser({ password: formData.password }));
       navigate(ROUTE.WALLETS);
     } else {
       setError("Invalid password");
