@@ -1,18 +1,16 @@
 import { FormEvent, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { useForm } from "../../hooks";
-import { userSelector, walletSelector } from "../../store";
-import { ROUTE } from "../../routes";
+import { useSelector } from "react-redux";
+import { Link, useParams } from "react-router-dom";
 import { WalletFactory } from "../../factory";
+import { useForm } from "../../hooks";
+import { ROUTE } from "../../routes/routes";
+import { userSelector, walletSelector } from "../../store";
 
 const ShowPrivateKey = () => {
   const { address = "" } = useParams();
   const user = useSelector(userSelector);
   const wallet = useSelector(walletSelector(address));
   const [privateKey, setPrivateKey] = useState("");
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
   const { formData, error, onChange, setError } = useForm({
     password: "",
   });
@@ -45,7 +43,12 @@ const ShowPrivateKey = () => {
       <h4>Show private key for {wallet.name}</h4>
 
       {privateKey ? (
-        <textarea id="privateKey" name="privateKey" value={privateKey} />
+        <textarea
+          id="privateKey"
+          name="privateKey"
+          value={privateKey}
+          readOnly
+        />
       ) : (
         <>
           <form onSubmit={handleSubmit}>

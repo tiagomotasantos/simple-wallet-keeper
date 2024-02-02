@@ -3,7 +3,7 @@ import { useForm } from "../../hooks";
 import { useDispatch } from "react-redux";
 import { createUser } from "../../store/walletKeeperSlice";
 import { useNavigate } from "react-router-dom";
-import { ROUTE } from "../../routes";
+import { ROUTE } from "../../routes/routes";
 
 const CreatePassword = () => {
   const dispatch = useDispatch();
@@ -40,14 +40,14 @@ const CreatePassword = () => {
       <form onSubmit={handleSubmit}>
         <label htmlFor="newPassword">New password (min 8 chars)</label>
         <input
-          type="newPassword"
+          type="password"
           id="newPassword"
           name="newPassword"
           onChange={onChange}
         />
         <label htmlFor="confirmPassword">Confirm password</label>
         <input
-          type="confirmPassword"
+          type="password"
           id="confirmPassword"
           name="confirmPassword"
           onChange={onChange}

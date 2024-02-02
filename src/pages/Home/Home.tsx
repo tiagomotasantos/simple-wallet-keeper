@@ -1,13 +1,12 @@
 import { useSelector } from "react-redux";
-import { userSelector, walletsSelector } from "../../store";
-import EnterPassword from "./EnterPassword";
+import { walletsSelector } from "../../store";
 import CreatePassword from "./CreatePassword";
+import EnterPassword from "./EnterPassword";
 
 const Home = () => {
-  const user = useSelector(userSelector);
   const wallets = useSelector(walletsSelector);
 
-  return user || wallets.length ? <EnterPassword /> : <CreatePassword />;
+  return wallets.length ? <EnterPassword /> : <CreatePassword />;
 };
 
 export default Home;

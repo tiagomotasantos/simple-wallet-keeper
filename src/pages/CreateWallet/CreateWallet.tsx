@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { WalletFactory } from "../../factory";
 import { useForm } from "../../hooks";
-import { ROUTE } from "../../routes";
+import { ROUTE } from "../../routes/routes";
 import { userSelector, walletsSelector } from "../../store";
 import { createWallet } from "../../store/walletKeeperSlice";
 
