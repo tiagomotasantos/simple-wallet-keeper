@@ -1,20 +1,21 @@
 import { ethers } from "ethers";
-import { User, Wallet } from "../models";
+import { NetworkProvider, User, Wallet } from "../models";
 import AES from "crypto-js/aes";
 import ENC from "crypto-js/enc-utf8";
-
-export type NetworkProvider = ethers.AbstractProvider;
 
 class WalletKeeper {
   static async createWallet(name: string, user: User): Promise<Wallet> {
     const wallet = ethers.Wallet.createRandom();
-    const encrypted = await wallet.encrypt(user.password);
-    const encryptedWallet = AES.encrypt(encrypted, user.password).toString();
+    const encryptedWallet = await wallet.encrypt(user.password);
+    const aesEncryptedWallet = AES.encrypt(
+      encryptedWallet,
+      user.password
+    ).toString();
 
     return {
       name,
       address: wallet.address,
-      encryptedWallet,
+      encryptedWallet: aesEncryptedWallet,
     };
   }
 
@@ -22,8 +23,12 @@ class WalletKeeper {
     wallet: Wallet,
     password: string
   ): Promise<string> {
+    const aesDecryptedWallet = AES.decrypt(
+      wallet.encryptedWallet,
+      password
+    ).toString(ENC);
     const decryptedWallet = await ethers.Wallet.fromEncryptedJson(
-      AES.decrypt(wallet.encryptedWallet, password).toString(ENC),
+      aesDecryptedWallet,
       password
     );
 
@@ -36,14 +41,11 @@ class WalletKeeper {
   ): Promise<boolean> {
     if (wallets.length) {
       try {
-        await ethers.Wallet.fromEncryptedJson(
-          AES.decrypt(wallets[0].encryptedWallet, password).toString(ENC),
-          password
-        );
+        await this.getPrivateKeyFromWallet(wallets[0], password);
 
         return true;
       } catch (error) {
-        // in case of error is considered that validation failed
+        // if we get here means that verification failed
       }
     }
 

@@ -1,9 +1,9 @@
-import { FormEvent } from "react";
+import { FormEvent, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "../../hooks";
 import { WalletKeeper } from "../../models";
-import { ROUTE } from "../../routes/routes";
+import { ROUTE } from "../../routes";
 import { walletsSelector } from "../../store";
 import { updateUser } from "../../store/walletKeeperSlice";
 
@@ -14,20 +14,23 @@ const EnterPassword = () => {
   const { formData, error, onChange, setError } = useForm({
     password: "",
   });
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault();
-    const isValidPassword = await WalletKeeper.verifyUserPassword(
-      formData.password,
-      wallets
-    );
+  const handleSubmit = useCallback(
+    async (event: FormEvent) => {
+      event.preventDefault();
+      const isAuthorized = await WalletKeeper.verifyUserPassword(
+        formData.password,
+        wallets
+      );
 
-    if (isValidPassword) {
-      dispatch(updateUser({ password: formData.password }));
-      navigate(ROUTE.WALLETS);
-    } else {
-      setError("Invalid password");
-    }
-  };
+      if (isAuthorized) {
+        dispatch(updateUser({ password: formData.password }));
+        navigate(ROUTE.WALLETS);
+      } else {
+        setError("Invalid password");
+      }
+    },
+    [formData.password, wallets, dispatch, navigate, setError]
+  );
 
   return (
     <div>

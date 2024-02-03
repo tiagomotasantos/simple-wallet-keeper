@@ -1,8 +1,8 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useCallback, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import { useForm } from "../../hooks";
-import { ROUTE } from "../../routes/routes";
+import { ROUTE } from "../../routes";
 import { userSelector, walletSelector } from "../../store";
 import { WalletKeeper } from "../../models";
 
@@ -14,22 +14,25 @@ const ShowPrivateKey = () => {
   const { formData, error, onChange, setError } = useForm({
     password: "",
   });
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault();
+  const handleSubmit = useCallback(
+    async (event: FormEvent) => {
+      event.preventDefault();
 
-    if (wallet && user) {
-      try {
-        const privateKey = await WalletKeeper.getPrivateKeyFromWallet(
-          wallet,
-          formData.password
-        );
+      if (wallet && user) {
+        try {
+          const privateKey = await WalletKeeper.getPrivateKeyFromWallet(
+            wallet,
+            formData.password
+          );
 
-        setPrivateKey(privateKey);
-      } catch (error) {
-        setError("Wrong password");
+          setPrivateKey(privateKey);
+        } catch (error) {
+          setError("Wrong password");
+        }
       }
-    }
-  };
+    },
+    [formData.password, user, wallet, setError]
+  );
 
   if (!wallet) {
     return <div>Wallet not found</div>;

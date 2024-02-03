@@ -1,7 +1,7 @@
-import { FC, useCallback, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Wallet as WalletModel } from "../../models";
-import WalletKeeper, { NetworkProvider } from "../../models/WalletKeeper";
+import { NetworkProvider, Wallet as WalletModel } from "../../models";
+import WalletKeeper from "../../models/WalletKeeper";
 
 interface WalletProps {
   wallet: WalletModel;
@@ -10,14 +10,14 @@ interface WalletProps {
 
 const Wallet: FC<WalletProps> = ({ wallet, provider }) => {
   const [balance, setBalance] = useState("");
+  const [balanceError, setBalanceError] = useState("");
   const getBalance = useCallback(async () => {
     try {
       const walletBalance = await provider.getBalance(wallet.address);
 
       setBalance(WalletKeeper.formatBalance(walletBalance));
     } catch (error) {
-      // failed to load balance
-      console.log(error);
+      setBalanceError("Failed to load");
     }
   }, [provider, wallet, setBalance]);
 
@@ -25,10 +25,24 @@ const Wallet: FC<WalletProps> = ({ wallet, provider }) => {
     getBalance();
   }, [provider, getBalance]);
 
+  const Balance = useMemo(
+    () => (
+      <>
+        Balance:{" "}
+        {balanceError
+          ? balanceError
+          : balance
+          ? `${balance} ETH`
+          : "Loading..."}
+      </>
+    ),
+    [balance, balanceError]
+  );
+
   return (
     <div>
       <p>
-        {wallet.name} | Balance: {balance ? `${balance} ETH` : "Loading..."}
+        {wallet.name} | {Balance}
       </p>
       <p>{wallet.address}</p>
       <Link to={`/wallet/${wallet.address}/private-key`}>Show private key</Link>
