@@ -21,6 +21,7 @@ const EnterPassword = () => {
         formData.password,
         wallets
       );
+      console.log("OI");
 
       if (isAuthorized) {
         dispatch(updateUser({ password: formData.password }));

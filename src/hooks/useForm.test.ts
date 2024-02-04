@@ -1,4 +1,4 @@
-import { renderHook } from "@testing-library/react";
+import { renderHook, waitFor } from "@testing-library/react";
 import useForm from "./useForm";
 import { FormEvent } from "react";
 
@@ -23,14 +23,18 @@ describe("useForm", () => {
     rerender();
     expect(result.current.formData).toEqual({ test: expected });
   });
-  test("should set error", () => {
+  test("should set error", async () => {
     const { result, rerender } = renderHook(() => useForm(defaultValues));
     const { error, setError } = result.current;
     const expected = "test error";
 
     expect(error).toBe("");
-    setError(expected);
+    await waitFor(() => {
+      setError(expected);
+    });
     rerender();
-    expect(result.current.error).toEqual(expected);
+    await waitFor(() => {
+      expect(result.current.error).toEqual(expected);
+    });
   });
 });

@@ -57,13 +57,14 @@ const CreateWallet = () => {
         <input
           type="text"
           id="name"
+          data-testid="name"
           name="name"
           defaultValue={formData.name}
           onChange={onChange}
         />
-        <input type="submit" value="Create wallet" />
+        <input data-testid="create" type="submit" value="Create wallet" />
       </form>
-      {error && <p>{error}</p>}
+      {error && <p data-testid="create-error">{error}</p>}
     </div>
   );
 };

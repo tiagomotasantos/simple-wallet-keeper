@@ -30,7 +30,7 @@ class WalletKeeper {
   }
 
   static getProvider(network: string) {
-    return { getBalance: async () => BigInt(Math.random() * 1000) };
+    return { getBalance: () => BigInt(1000) };
   }
 
   static getWalletBalance(

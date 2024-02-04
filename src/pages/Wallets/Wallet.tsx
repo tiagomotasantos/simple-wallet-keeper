@@ -2,6 +2,7 @@ import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { NetworkProvider, Wallet as WalletModel } from "../../models";
 import WalletKeeper from "../../models/WalletKeeper";
+import "./Wallet.css";
 
 interface WalletProps {
   wallet: WalletModel;
@@ -40,7 +41,7 @@ const Wallet: FC<WalletProps> = ({ wallet, provider }) => {
   );
 
   return (
-    <div>
+    <div data-testid="wallet" className="wallet">
       <p>
         {wallet.name} | {Balance}
       </p>

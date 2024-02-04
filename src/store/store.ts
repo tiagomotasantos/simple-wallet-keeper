@@ -20,6 +20,13 @@ const persistConfig = {
 
 const persistedReducer = persistReducer(persistConfig, walletKeeperReducer);
 
+export const setupStore = (preloadedState?: RootState) => {
+  return configureStore({
+    reducer: walletKeeperReducer,
+    preloadedState,
+  });
+};
+
 export const store = configureStore({
   reducer: persistedReducer,
   devTools: process.env.NODE_ENV !== "production",
@@ -34,3 +41,4 @@ export const persistor = persistStore(store);
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
+export type AppStore = ReturnType<typeof setupStore>;

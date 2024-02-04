@@ -47,6 +47,7 @@ const ShowPrivateKey = () => {
         <textarea
           id="privateKey"
           name="privateKey"
+          data-testid="privateKey"
           value={privateKey}
           readOnly
         />
@@ -58,9 +59,10 @@ const ShowPrivateKey = () => {
               type="password"
               id="password"
               name="password"
+              data-testid="password"
               onChange={onChange}
             />
-            <input type="submit" value="Show" />
+            <input data-testid="showPrivateKey" type="submit" value="Show" />
           </form>
           {error && <p>{error}</p>}
         </>
