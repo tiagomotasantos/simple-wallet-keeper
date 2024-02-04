@@ -1,15 +1,18 @@
 import { FormEvent, useCallback, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import { useForm } from "../../hooks";
 import { ROUTE } from "../../routes";
-import { userSelector, walletSelector } from "../../store";
+import { loadingSelector, userSelector, walletSelector } from "../../store";
 import { WalletKeeper } from "../../models";
+import { updateLoading } from "../../store/walletKeeperSlice";
 
 const ShowPrivateKey = () => {
   const { address = "" } = useParams();
   const user = useSelector(userSelector);
   const wallet = useSelector(walletSelector(address));
+  const loading = useSelector(loadingSelector);
+  const dispatch = useDispatch();
   const [privateKey, setPrivateKey] = useState("");
   const { formData, error, onChange, setError } = useForm({
     password: "",
@@ -20,6 +23,8 @@ const ShowPrivateKey = () => {
 
       if (wallet && user) {
         try {
+          dispatch(updateLoading(true));
+
           const privateKey = await WalletKeeper.getPrivateKeyFromWallet(
             wallet,
             formData.password
@@ -28,10 +33,12 @@ const ShowPrivateKey = () => {
           setPrivateKey(privateKey);
         } catch (error) {
           setError("Wrong password");
+        } finally {
+          dispatch(updateLoading(false));
         }
       }
     },
-    [formData.password, user, wallet, setError]
+    [formData.password, user, wallet, setError, dispatch]
   );
 
   if (!wallet) {
@@ -62,7 +69,12 @@ const ShowPrivateKey = () => {
               data-testid="password"
               onChange={onChange}
             />
-            <input data-testid="showPrivateKey" type="submit" value="Show" />
+            <input
+              data-testid="showPrivateKey"
+              type="submit"
+              value="Show"
+              disabled={loading}
+            />
           </form>
           {error && <p>{error}</p>}
         </>

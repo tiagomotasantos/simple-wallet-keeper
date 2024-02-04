@@ -1,10 +1,10 @@
 import { FormEvent, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "../../hooks";
 import { ROUTE } from "../../routes";
-import { userSelector, walletsSelector } from "../../store";
-import { createWallet } from "../../store/walletKeeperSlice";
+import { loadingSelector, userSelector, walletsSelector } from "../../store";
+import { createWallet, updateLoading } from "../../store/walletKeeperSlice";
 import { WalletKeeper } from "../../models";
 
 const CreateWallet = () => {
@@ -12,6 +12,7 @@ const CreateWallet = () => {
   const navigate = useNavigate();
   const user = useSelector(userSelector);
   const wallets = useSelector(walletsSelector);
+  const loading = useSelector(loadingSelector);
   const { formData, error, onChange, setError } = useForm({
     name: `Wallet ${wallets.length + 1}`,
   });
@@ -34,6 +35,8 @@ const CreateWallet = () => {
           setError(error);
         } else {
           if (user) {
+            dispatch(updateLoading(true));
+
             const wallet = await WalletKeeper.createWallet(formData.name, user);
 
             dispatch(createWallet(wallet));
@@ -44,6 +47,8 @@ const CreateWallet = () => {
         }
       } catch (error) {
         setError("Failed to create wallet");
+      } finally {
+        dispatch(updateLoading(false));
       }
     },
     [formData.name, user, dispatch, navigate, setError, validate]
@@ -51,7 +56,8 @@ const CreateWallet = () => {
 
   return (
     <div>
-      <h5>Create wallet</h5>
+      <Link to={ROUTE.WALLETS}>Go back</Link>
+      <h4>Create wallet</h4>
       <form onSubmit={handleSubmit}>
         <label htmlFor="name">Wallet name</label>
         <input
@@ -62,7 +68,12 @@ const CreateWallet = () => {
           defaultValue={formData.name}
           onChange={onChange}
         />
-        <input data-testid="create" type="submit" value="Create wallet" />
+        <input
+          data-testid="create"
+          type="submit"
+          value="Create wallet"
+          disabled={loading}
+        />
       </form>
       {error && <p data-testid="create-error">{error}</p>}
     </div>

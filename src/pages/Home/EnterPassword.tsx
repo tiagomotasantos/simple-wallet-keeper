@@ -4,11 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { useForm } from "../../hooks";
 import { WalletKeeper } from "../../models";
 import { ROUTE } from "../../routes";
-import { walletsSelector } from "../../store";
-import { updateUser } from "../../store/walletKeeperSlice";
+import { loadingSelector, walletsSelector } from "../../store";
+import { updateLoading, updateUser } from "../../store/walletKeeperSlice";
 
 const EnterPassword = () => {
   const wallets = useSelector(walletsSelector);
+  const loading = useSelector(loadingSelector);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { formData, error, onChange, setError } = useForm({
@@ -17,11 +18,12 @@ const EnterPassword = () => {
   const handleSubmit = useCallback(
     async (event: FormEvent) => {
       event.preventDefault();
+      dispatch(updateLoading(true));
+
       const isAuthorized = await WalletKeeper.verifyUserPassword(
         formData.password,
         wallets
       );
-      console.log("OI");
 
       if (isAuthorized) {
         dispatch(updateUser({ password: formData.password }));
@@ -29,6 +31,8 @@ const EnterPassword = () => {
       } else {
         setError("Invalid password");
       }
+
+      dispatch(updateLoading(false));
     },
     [formData.password, wallets, dispatch, navigate, setError]
   );
@@ -44,7 +48,7 @@ const EnterPassword = () => {
           name="password"
           onChange={onChange}
         />
-        <input type="submit" value="Unlock" />
+        <input type="submit" value="Unlock" disabled={loading} />
       </form>
       {error && <p>{error}</p>}
     </div>
